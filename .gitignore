@@ -3,3 +3,5 @@
 ################################################################################
 
 /.vs
+/AIDocumentAnalysis/AIDocumentAnalysis-BE/obj
+/AIDocumentAnalysis/.vs/AIDocumentAnalysis
