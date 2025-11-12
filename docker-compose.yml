@@ -1,0 +1,16 @@
+services:
+  aidocumentanalysis:
+    container_name: aidocumentanalysis
+    build:
+      context: ./src/AIDocumentAnalysis
+      dockerfile: Dockerfile
+    depends_on:
+      - ai-doc-analysis-storage
+
+  ai-doc-analysis-storage:    
+    container_name: aidocumentanalysis-storage
+    build:
+      context: ./Docker/Database
+      dockerfile: Dockerfile_local
+    ports:
+      - "5001:5001"
