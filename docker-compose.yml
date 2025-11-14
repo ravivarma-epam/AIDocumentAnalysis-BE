@@ -13,4 +13,4 @@ services:
       context: ./Docker/Database
       dockerfile: Dockerfile_local
     ports:
-      - "5001:5001"
+      - "5432:5432"
