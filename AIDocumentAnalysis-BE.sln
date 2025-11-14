@@ -10,6 +10,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIDocumentAnalysis", "src\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIDocumentAnalysis.E2E.Tests", "tests\AIDocumentAnalysis.E2E.Tests\AIDocumentAnalysis.E2E.Tests.csproj", "{72C38722-E331-FD8E-1E15-250C12B8ADB2}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{A84D1958-5299-401C-8352-0BAB111E1428}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +30,10 @@ Global
 		{72C38722-E331-FD8E-1E15-250C12B8ADB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72C38722-E331-FD8E-1E15-250C12B8ADB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72C38722-E331-FD8E-1E15-250C12B8ADB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -31,6 +41,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FB48B54B-865E-6354-E55A-176D9FA7F003} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{72C38722-E331-FD8E-1E15-250C12B8ADB2} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{A84D1958-5299-401C-8352-0BAB111E1428} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {974F90E7-048F-4C4B-AFAA-E4834542520F}
