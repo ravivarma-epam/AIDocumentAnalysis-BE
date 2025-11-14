@@ -7,15 +7,14 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/AIDocumentAnalysis/AIDocumentAnalysis.csproj", "src/AIDocumentAnalysis/"]
-RUN dotnet restore "./src/AIDocumentAnalysis/AIDocumentAnalysis.csproj"
+RUN ls
+COPY ["AIDocumentAnalysis.csproj", "./"]
+RUN dotnet restore "./AIDocumentAnalysis.csproj"
 COPY . .
-WORKDIR "/src/src/AIDocumentAnalysis"
 RUN dotnet build "./AIDocumentAnalysis.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

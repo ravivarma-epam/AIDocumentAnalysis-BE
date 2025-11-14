@@ -11,6 +11,6 @@ services:
     container_name: aidocumentanalysis-storage
     build:
       context: ./Docker/Database
-      dockerfile: Dockerfile_local
+      dockerfile: Dockerfile
     ports:
-      - "5001:5001"
+      - "5432:5432"
