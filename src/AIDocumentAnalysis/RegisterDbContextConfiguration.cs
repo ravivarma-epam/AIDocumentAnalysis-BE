@@ -1,9 +1,7 @@
 ﻿using AIDocumentAnalysis.Configurations;
 using AIDocumentAnalysis.DataAccess;
 using AIDocumentAnalysis.Utils.Enums;
-
 using Microsoft.EntityFrameworkCore;
-
 using Npgsql;
 
 namespace AIDocumentAnalysis

@@ -1,16 +1,11 @@
 ﻿using System.Text.Json;
-
 using AIDocumentAnalysis.Configurations;
 using AIDocumentAnalysis.Extensions;
 using AIDocumentAnalysis.Utils.Enums;
-
 using FastEndpoints.Swagger;
-
 using Flurl;
-
 using NSwag;
 using NSwag.AspNetCore;
-
 using Serilog;
 
 namespace AIDocumentAnalysis
