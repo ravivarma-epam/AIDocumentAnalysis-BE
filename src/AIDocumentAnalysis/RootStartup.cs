@@ -1,11 +1,20 @@
 ﻿using System.Text.Json;
+
 using AIDocumentAnalysis.Configurations;
 using AIDocumentAnalysis.Extensions;
+using AIDocumentAnalysis.Services;
 using AIDocumentAnalysis.Utils.Enums;
+
+using FastEndpoints.Security;
 using FastEndpoints.Swagger;
+
 using Flurl;
+
+using Microsoft.AspNetCore.Authorization;
+
 using NSwag;
 using NSwag.AspNetCore;
+
 using Serilog;
 
 namespace AIDocumentAnalysis
@@ -28,11 +37,12 @@ namespace AIDocumentAnalysis
 
         public void ConfigureServices(IServiceCollection services)
         {
+            ConfigureApplicationConfiguration(services);
             services.AddHealthChecks();
             services.RegisterDbContexts(Configuration);
             services.ConfigureCorsPolicy(Configuration);
             services.AddSerilog();
-            services.AddAuthentication();
+            ConfigureAuthentication(services, Configuration);
             services.AddAuthorization();
             services.AddControllers()
                 .AddJsonOptions(options =>
@@ -40,7 +50,38 @@ namespace AIDocumentAnalysis
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                 });
-            services.AddFastEndpoints().AddOpenApiDocument().AddEndpointsApiExplorer();
+            services.AddFastEndpoints()
+                .SwaggerDocument(o =>
+                    {
+                        o.DocumentSettings = s =>
+                        {
+                            s.Title = "AI Document Analysis API";
+                            s.Version = "v3";
+                        };
+                        o.EnableJWTBearerAuth = true;
+                    });
+        }
+
+        public void ConfigureAuthentication(IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<AuthService>();
+            var juwtConfig = configuration.GetSection(JWTAuthConfiguration.SectionName).Get<JWTAuthConfiguration>();
+            services.AddAuthenticationJwtBearer(
+                s => s.SigningKey = configuration["Jwt:Key"],
+                o =>
+                {
+                    o.TokenValidationParameters.ValidIssuer = configuration["Jwt:Issuer"];
+                    o.TokenValidationParameters.ValidAudience = configuration["Jwt:Audience"];
+                    o.TokenValidationParameters.ValidateLifetime = true;
+                });
+
+            // 3. Configure Authorization (Secure by Default)
+            services.AddAuthorization(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment environment)
@@ -48,13 +89,9 @@ namespace AIDocumentAnalysis
             app.UseDefaultExceptionHandler();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
-            if (environment.IsDevelopment())
-            {
-                app.UseHsts();
-            }
             app.UseCors();
             app.UseSerilogRequestLogging();
-           
+
             Url composedBasePath = new Url("/api/aida-core");
             app.UseRouting();
             app.UseAuthentication();
@@ -63,32 +100,34 @@ namespace AIDocumentAnalysis
             {
                 if (context.Request.Path == "/")
                 {
-                    context.Response.Redirect("/swagger");
+                    context.Response.Redirect($"{composedBasePath}/swagger");
                     return;
                 }
                 await next();
-            });
-
-            app.UseOpenApi();
-            app.UseSwaggerUi(x => x.ConfigureDefaults());
+            });            
             app.UseEndpoints(delegate (IEndpointRouteBuilder endpoints)
             {
                 endpoints.MapFastEndpoints(delegate (Config cfg)
                 {
                     cfg.Endpoints.RoutePrefix = composedBasePath.ToString().TrimStart('/');
                 });
-                endpoints.MapControllers();
+                endpoints.MapControllers();                
             });
-            app.UseSwaggerGen(delegate (OpenApiDocumentMiddlewareSettings cfg)
+            app.UseSwaggerGen(ui =>
             {
-                cfg.Path = composedBasePath.Clone().AppendPathSegment("swagger").AppendPathSegment("v1")
-                    .AppendPathSegment("swagger.json");
-                cfg.PostProcess = delegate (OpenApiDocument context, HttpRequest next)
-                {
-                    context.Schemes.Clear();
-                    context.Host = string.Empty;
-                };
-            });            
+                ui.Path = $"{composedBasePath}/swagger/{{documentName}}/swagger.json";
+            });
+            app.UseSwaggerUi(ui =>
+            {
+                ui.Path = $"{composedBasePath}/swagger";
+                ui.DocumentPath = $"{composedBasePath}/swagger/{{documentName}}/swagger.json";
+                ui.ConfigureDefaults();
+            });
+        }
+
+        public void ConfigureApplicationConfiguration(IServiceCollection services)
+        {
+            services.Configure<JWTAuthConfiguration>(Configuration.GetSection(JWTAuthConfiguration.SectionName));
         }
     }
 

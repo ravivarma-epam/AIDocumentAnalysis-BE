@@ -9,7 +9,7 @@ services:
     depends_on:
       - ai-doc-analysis-storage
 
-  ai-doc-analysis-storage:    
+  ai-doc-analysis-storage:
     container_name: aidocumentanalysis-storage
     build:
       context: .
