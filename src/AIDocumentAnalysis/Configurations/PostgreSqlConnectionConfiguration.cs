@@ -14,15 +14,19 @@ namespace AIDocumentAnalysis.Configurations
             var connectionStringKey = databaseKey.ToString();
 
             string? connectionString = configuration.GetConnectionString(connectionStringKey);
-
-            var userId = configuration[$"ConnectionStrings:{connectionStringKey}:username"];
-            var password = configuration[$"ConnectionStrings:{connectionStringKey}:password"];
-            var port = configuration[$"ConnectionStrings:{connectionStringKey}:port"];
-            var databaseName = configuration[$"ConnectionStrings:{connectionStringKey}:databaseName"];
-            var host = configuration[$"ConnectionStrings:{connectionStringKey}:host"];
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException($"Connection string template for '{databaseKey}' not found.");
+            }
+            var keyPrefix = $"ConnectionStrings:{databaseKey}";
+            var username = configuration[$"{keyPrefix}:username"];
+            var password = configuration[$"{keyPrefix}:password"];
+            var port = configuration[$"{keyPrefix}:port"];
+            var databaseName = configuration[$"{keyPrefix}:databaseName"];
+            var host = configuration[$"{keyPrefix}:host"];
 
             return connectionString
-                .Replace("[[UserId]]", userId, StringComparison.InvariantCulture)
+                .Replace("[[UserId]]", username, StringComparison.InvariantCulture)
                 .Replace("[[Password]]", password, StringComparison.InvariantCulture)
                 .Replace("[[Port]]", port, StringComparison.InvariantCulture)
                 .Replace("[[DatabaseName]]", databaseName, StringComparison.InvariantCulture)

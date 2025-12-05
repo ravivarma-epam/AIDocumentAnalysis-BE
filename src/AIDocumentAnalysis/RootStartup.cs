@@ -37,7 +37,7 @@ namespace AIDocumentAnalysis
 
         public void ConfigureServices(IServiceCollection services)
         {
-            ConfigureApplicationConfiguration(services);
+            services.Configure<JWTAuthConfiguration>(Configuration.GetSection(JWTAuthConfiguration.SectionName));
             services.AddHealthChecks();
             services.RegisterDbContexts(Configuration);
             services.ConfigureCorsPolicy(Configuration);
@@ -123,11 +123,6 @@ namespace AIDocumentAnalysis
                 ui.DocumentPath = $"{composedBasePath}/swagger/{{documentName}}/swagger.json";
                 ui.ConfigureDefaults();
             });
-        }
-
-        public void ConfigureApplicationConfiguration(IServiceCollection services)
-        {
-            services.Configure<JWTAuthConfiguration>(Configuration.GetSection(JWTAuthConfiguration.SectionName));
         }
     }
 
