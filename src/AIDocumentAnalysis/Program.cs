@@ -1,48 +1,32 @@
-using System.Text.Json;
+using AIDocumentAnalysis.Configurations;
+using Serilog;
 
-using AIDocumentAnalysis.Extensions;
+namespace AIDocumentAnalysis;
 
-using FastEndpoints.Swagger;
-
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.WebHost.ConfigureKestrel(options =>
+public static class Program
 {
-    options.AddServerHeader = false;
-    options.AllowSynchronousIO = false;
-});
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args).Build().Run();
+    }
 
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+                Host.CreateDefaultBuilder(args)
+                .RegisterConfigurationsAndSecrets(RootStartup.DatabaseConnectionSringKeys)
+                .UseSerilog((context, configuration) =>
+                {
+                    configuration
+                        .ReadFrom.Configuration(context.Configuration)
+                        .Enrich.FromLogContext();
+                })
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                    _ = webBuilder.UseStartup<RootStartup>()
+                        .ConfigureKestrel((context, options) =>
+                        {
+                            options.Limits.MaxRequestBodySize = context.Configuration.GetValue<long>("MaxRequestBodySize");
+                        });                
+                 });
 
-builder.Host.UseConsoleLifetime(options => options.SuppressStatusMessages = true);
-
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
-
-builder.Services.AddFastEndpoints().AddOpenApiDocument().AddEndpointsApiExplorer();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseDefaultExceptionHandler();
-}
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseFastEndpoints(options =>
-{
-    options.Errors.ResponseBuilder = (errors, _, _) => errors.ToResponse();
-    options.Errors.StatusCode = StatusCodes.Status422UnprocessableEntity;
-    options.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-});
-
-app.UseOpenApi();
-app.UseSwaggerUi(x => x.ConfigureDefaults());
-
-await app.RunAsync();
-
-public partial class Program
-{
 }
