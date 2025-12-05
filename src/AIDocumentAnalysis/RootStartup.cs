@@ -89,7 +89,7 @@ namespace AIDocumentAnalysis
             app.UseDefaultExceptionHandler();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
-            app.UseCors();
+            app.UseCors("CorsPolicy");
             app.UseSerilogRequestLogging();
 
             Url composedBasePath = new Url("/api/aida-core");

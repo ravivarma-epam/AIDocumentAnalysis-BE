@@ -1,9 +1,12 @@
-﻿using AIDocumentAnalysis.Services;
+﻿using System.Text.Json.Serialization;
+
+using AIDocumentAnalysis.Services;
 
 namespace AIDocumentAnalysis.Endpoints.Auth.GoogleLogin;
 
 public record GoogleLoginRequest
 {
+    [JsonPropertyName("id_token")]
     public  required string IdToken { get; init; }
 }
 
