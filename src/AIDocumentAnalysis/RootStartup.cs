@@ -38,6 +38,19 @@ namespace AIDocumentAnalysis
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JWTAuthConfiguration>(Configuration.GetSection(JWTAuthConfiguration.SectionName));
+            services.Configure<DocumentIntelligenceOptions>(Configuration.GetSection(DocumentIntelligenceOptions.SectionName));
+            services.AddSingleton(sp =>
+            {
+                var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<DocumentIntelligenceOptions>>().Value;
+                if (string.IsNullOrWhiteSpace(opts.Endpoint) || string.IsNullOrWhiteSpace(opts.ApiKey))
+                {
+                    return null!; 
+                }
+                return new Azure.AI.DocumentIntelligence.DocumentIntelligenceClient(new System.Uri(opts.Endpoint), new Azure.AzureKeyCredential(opts.ApiKey));
+            });
+
+            services.AddScoped<DocumentIntelligenceService>();
+            services.AddScoped<Services.Interfaces.IDocumentIntelligenceService>(sp => sp.GetRequiredService<DocumentIntelligenceService>());
             services.AddHealthChecks();
             services.RegisterDbContexts(Configuration);
             services.ConfigureCorsPolicy(Configuration);
