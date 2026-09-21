@@ -1,0 +1,16 @@
+---
+description: Require the project backend-development skill for all C#/.NET backend work
+globs: "**/*.{cs,csproj}"
+alwaysApply: false
+---
+
+# Use /backend-development
+
+When working on files matching this rule, you MUST use the project skill `/backend-development`.
+
+1. Read `.cursor/skills/backend-development/SKILL.md` before writing or changing C#/.NET code.
+2. Follow every workflow, critical, structure, formatting, data-access, and testing rule in that skill.
+3. Do not skip the pause after service/endpoint/repository work: ask before any test changes.
+4. Use EF Core only for data access. Do not add raw SQL.
+
+If the skill file is missing, stop and tell the user instead of inventing conventions.

@@ -7,5 +7,6 @@ namespace AIDocumentAnalysis.Configurations
         public string Endpoint { get; set; } = string.Empty;
         public string ApiKey { get; set; } = string.Empty;
         public string ModelId { get; set; } = "prebuilt-read";
+        public string OutputDirectory { get; set; } = "OutputDirectory";
     }
 }
