@@ -88,11 +88,11 @@ namespace AIDocumentAnalysis
             services.AddScoped<AuthService>();
             var juwtConfig = configuration.GetSection(JWTAuthConfiguration.SectionName).Get<JWTAuthConfiguration>();
             services.AddAuthenticationJwtBearer(
-                s => s.SigningKey = configuration["Jwt:Key"],
+                s => s.SigningKey = juwtConfig!.SecretKey,
                 o =>
                 {
-                    o.TokenValidationParameters.ValidIssuer = configuration["Jwt:Issuer"];
-                    o.TokenValidationParameters.ValidAudience = configuration["Jwt:Audience"];
+                    o.TokenValidationParameters.ValidIssuer = juwtConfig.Issuer;
+                    o.TokenValidationParameters.ValidAudience = juwtConfig.Audience;
                     o.TokenValidationParameters.ValidateLifetime = true;
                 });
 
