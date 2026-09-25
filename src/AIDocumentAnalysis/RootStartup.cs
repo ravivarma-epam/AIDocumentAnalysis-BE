@@ -8,6 +8,7 @@ using AIDocumentAnalysis.Utils.Enums;
 
 using Azure;
 using Azure.AI.DocumentIntelligence;
+using Azure.Storage.Blobs;
 
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
@@ -17,8 +18,6 @@ using Flurl;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
-using NSwag;
-using NSwag.AspNetCore;
 
 using Serilog;
 
@@ -50,14 +49,30 @@ namespace AIDocumentAnalysis
                     options => !string.IsNullOrWhiteSpace(options.Endpoint)
                         && !string.IsNullOrWhiteSpace(options.ApiKey)
                         && !string.IsNullOrWhiteSpace(options.ModelId)
-                        && !string.IsNullOrWhiteSpace(options.OutputDirectory),
-                    "DocumentIntelligence Endpoint, ApiKey, ModelId, and OutputDirectory must be set.")
+                        && !string.IsNullOrWhiteSpace(options.OutputDirectory)
+                        && !string.IsNullOrWhiteSpace(options.BlobConnectionString)
+                        && !string.IsNullOrWhiteSpace(options.BlobContainerName),
+                    "DocumentIntelligence Endpoint, ApiKey, ModelId, OutputDirectory, BlobConnectionString, and BlobContainerName must be set.")
                 .ValidateOnStart();
             services.AddSingleton(serviceProvider =>
             {
                 DocumentIntelligenceOptions options = serviceProvider.GetRequiredService<IOptions<DocumentIntelligenceOptions>>().Value;
                 return new DocumentIntelligenceClient(new Uri(options.Endpoint), new AzureKeyCredential(options.ApiKey));
             });
+
+            services.AddSingleton(serviceProvider =>
+            {
+                DocumentIntelligenceOptions options = serviceProvider.GetRequiredService<IOptions<DocumentIntelligenceOptions>>().Value;
+                BlobServiceClient blobServiceClient = new BlobServiceClient(options.BlobConnectionString);
+                if (!string.IsNullOrWhiteSpace(options.BlobContainerName))
+                {
+                    var containerClient = blobServiceClient.GetBlobContainerClient(options.BlobContainerName);
+                    containerClient.CreateIfNotExists();
+                }
+                return blobServiceClient;
+            });
+            services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
+
             services.AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>();
             services.AddHealthChecks();
             services.RegisterDbContexts(Configuration);
