@@ -20,13 +20,15 @@ namespace AIDocumentAnalysis.Endpoints.DocumentAnalysis
         {
             Post("documentanalysis/analyze");
             AllowFileUploads();
+            AllowAnonymous();
         }
 
         public override async Task HandleAsync(AnalyzeRequest req, CancellationToken ct)
         {
             _logger.LogInformation("Document analysis request received");
             await using Stream stream = req.File.OpenReadStream();
-            DocumentAnalysisResult saved = await _documentIntelligenceService.SaveAnalysisAsync(stream, ct);
+            string? originalFileName = req.File.FileName;
+            DocumentAnalysisResult saved = await _documentIntelligenceService.SaveAnalysisAsync(stream, originalFileName, ct);
             await SendOkAsync(new AnalyzeResponse { FilePath = saved.FilePath }, ct);
         }
 

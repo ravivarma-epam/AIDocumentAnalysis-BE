@@ -6,5 +6,10 @@ namespace AIDocumentAnalysis.Exceptions
             : base(message)
         {
         }
+
+        public DocumentIntelligenceException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
     }
 }

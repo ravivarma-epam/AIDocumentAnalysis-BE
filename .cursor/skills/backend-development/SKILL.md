@@ -63,6 +63,7 @@ S20: Pass `StringComparison.OrdinalIgnoreCase` to string methods that accept it.
 S21: Use range/index syntax instead of `Substring`.
 S22: New private methods go at the end of `#region Private Methods`.
 S23: Guard nullable ValueTuple members with `?? string.Empty`.
+S24: No unused using directives or imports. Remove any using statements that are not referenced by the file; prefer compiler/analyzer fixes (e.g., dotnet format or IDE remove) to keep files clean.
 
 ## Naming and formatting
 
