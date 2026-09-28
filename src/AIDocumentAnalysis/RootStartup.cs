@@ -64,11 +64,21 @@ namespace AIDocumentAnalysis
             {
                 DocumentIntelligenceOptions options = serviceProvider.GetRequiredService<IOptions<DocumentIntelligenceOptions>>().Value;
                 BlobServiceClient blobServiceClient = new BlobServiceClient(options.BlobConnectionString);
-                if (!string.IsNullOrWhiteSpace(options.BlobContainerName))
+
+                try
                 {
-                    var containerClient = blobServiceClient.GetBlobContainerClient(options.BlobContainerName);
-                    containerClient.CreateIfNotExists();
+                    if (!string.IsNullOrWhiteSpace(options.BlobContainerName))
+                    {
+                        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(options.BlobContainerName);
+                        containerClient.CreateIfNotExists();
+                    }
                 }
+                catch (Exception ex)
+                {
+                   ILogger<RootStartup>? logger = serviceProvider.GetService<ILogger<RootStartup>>();
+                   logger?.LogWarning(ex, "Failed to create or verify Azure Blob container '{ContainerName}' at startup. Blob operations will fail if container does not exist.", options.BlobContainerName);
+                }
+
                 return blobServiceClient;
             });
             services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
