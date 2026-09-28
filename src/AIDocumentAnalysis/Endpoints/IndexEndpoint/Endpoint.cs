@@ -10,7 +10,7 @@ public class IndexEndpoint : EndpointWithoutRequest<IndexResponse>
     public override void Configure()
     {
         Get("/");
-        AllowAnonymous();
+        Permissions("Authenticated");
     }
 
     public override async Task HandleAsync(CancellationToken ct)
